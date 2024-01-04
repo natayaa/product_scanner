@@ -6,14 +6,12 @@ from database.tableobject.scanned import Scanned
 
 class Logscan(DatabaseConnection):
     def __init__(self):
-        super.__init__()
+        super().__init__()
 
     def insert_logscan(self, incharge: str, result: str,  **product_detail):
         try:
             scanned = Scanned()
             scanned.tv_model = product_detail.get("tv_model")
-            scanned.tv_barcode = product_detail.get("tv_barcode")
-            scanned.remote_name = product_detail.get("remote_name")
             scanned.remote_barcode = product_detail.get("remote_barcode")
             scanned.pic = incharge
             scanned.result = result

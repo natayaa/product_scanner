@@ -31,8 +31,6 @@ class ProductConnection(DatabaseConnection):
         try:
             product = Products()
             product.tv_model = product_detail.get("tv_model")
-            product.tv_barcode = product_detail.get("tv_barcode")
-            product.remote_name = product_detail.get("remote_name")
             product.remote_barcode = product_detail.get("remote_barcode")
             product.insert_by = username
             self.session.add(product)
