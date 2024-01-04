@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="author" content="Ivan Azhari" />
+        <title>{{ title }}</title>
+        <!-- Favicon -->
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='assets/images/favicon.ico') }}"/>
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="{{ url_for('static', path='css/select2.min.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', path='css/bootstrap/bootstrap.min.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}" />
+    </head>
+
+    <body class="d-flex flex-column h-100 bg-dark">
+        <main class="flex-shrink-0 bg-gradient">
+            <header class="bg-dark"></header>
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                    <div class="container px-5">
+                        <a class="navbar-brand" href="/">
+                            <img src="{{ url_for('static', path='assets/images/sharp-logo.png') }}" alt="Barcode Scanner" width="150px;"/>
+                        </a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarContent">
+                            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="">Log Scanner</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="">Registered Product</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="">Input Product</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </header>
+
+            <div class="container px-5">
+                <div class="row gx-2 align-items-center justify-content-center mt-5">
+                    <div class="col-lg-8 col-xl-7 col-xxl-6">
+                        <div class="my-2 text-center text-xl-start">
+                            <form id="submit_barcode_form">
+                                <div class="col-md-6 mt-4" id="scanner-line-display">
+                                    <label for="select_line" class="form-label fw-bolder text-white mb-2 text-left display-10">Select LINE</label>
+                                    <select class="form-select" id="select_line">
+                                        {% for line in range(1,5) %}
+                                            <option value="line_{{ line }}">LINE {{ line }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mt-4" id="tv-model-display">
+                                    <label for="tv_model" class="form-label fw-bolder text-white mb-2 text-left display-10">TV Model</label>
+                                    <select class="form-select" id="tv_model">
+                                        <!-- call data from api endpoint -->
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mt-4 mb-5" id="carton-box-display">
+                                    <label for="carton_box" class="form-label fw-bolder text-white mb-2 text-left display-10">Carton Box</label>
+                                    <select class="form-select" id="carton_box">
+
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mt-4 mb-5" style="display: none;" id="barcode-input-display">
+                                    <label for="barcode-input" class="form-label fw-bolder text-white mb-2 text-left display-10">Input Barcode</label>
+                                    <input class="form-control" id="barcode-input">
+                                </div>
+                                <div class="col-md-6 mt-4" id="apply-button">
+                                    <button class="btn btn-primary" type="button" style="width: 100%;">Apply</button>
+                                </div>
+                                <div class="col-md-6 mt-4 mb-5" style="display: none;" id="refreshpage">
+                                    <button class="btn btn-secondary" type="button" style="width: 100%;" id="refresh-button">Refresh</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-xxl-6 x-xl-block text-center">
+                        <h6 class="display-10 text-left fw-bolder text-white mb-2">Status :</h6>
+                        <img class="img-fluid rounded-3 my-3" id="status-product-image" src="{{ url_for('static', path='assets/images/waiting-scanner.png ')}}" alt="Scan Status">
+                    </div>
+                </div>                
+            </div>            
+        </main>
+        <!-- javascripts -->
+        <script src="{{ url_for('static', path='js/jquery.min.js')}}"></script>
+        <script src="{{ url_for('static', path='js/jquery.magnific-popup.min.js ')}}"></script>
+        <script src="{{ url_for('static', path='js/bootstrap/bootstrap.min.js') }}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function (event) {
+                event.preventDefault();
+                var applyButton = document.getElementById('apply-button');
+                var barcodeInputDisplay = document.getElementById('barcode-input-display');
+                var lineDisplay = document.getElementById('scanner-line-display');
+                var tvModelDisplay = document.getElementById('tv-model-display');
+                var cartonBoxDisplay = document.getElementById('carton-box-display');
+                var submitBarcode = document.getElementById("submit_barcode_form");
+                var displayRefresh = document.getElementById("refreshpage");
+                var refresh_button = document.getElementById("refresh-button");
+
+                
+                var barcodeInput = document.getElementById("barcode-input");
+                var selectline = document.getElementById("select_line");
+                var tv_model = document.getElementById("tv_model");
+                
+        
+                applyButton.addEventListener('click', function () {
+                    // Hide unnecessary elements
+                    lineDisplay.style.display = 'none';
+                    tvModelDisplay.style.display = 'none';
+                    cartonBoxDisplay.style.display = 'none';
+                    applyButton.style.display = 'none';
+                    // Display the barcode input
+                    barcodeInputDisplay.style.display = 'block';
+                    displayRefresh.style.display = 'block';
+                });
+
+                submitBarcode.addEventListener("submit", function(event) {
+                    event.preventDefault();
+                    var inputtedbarcode = barcodeInput.value;
+                    var selectedline = selectline.value;
+                    
+                });
+
+                refresh_button.addEventListener("click", function(event) {
+                    window.location.reload();
+                })
+            });
+        </script>        
+    </body>
+</html>
