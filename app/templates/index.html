@@ -84,8 +84,10 @@
                         <img class="img-fluid rounded-3 my-3" id="status-product-image" src="{{ url_for('static', path='assets/images/waiting-scanner.png ')}}" alt="Scan Status">
                     </div>
                 </div>                
-            </div>            
+            </div>          
         </main>
+        <!-- Footer -->
+
         <!-- javascripts -->
         <script src="{{ url_for('static', path='js/jquery.min.js')}}"></script>
         <script src="{{ url_for('static', path='js/jquery.magnific-popup.min.js ')}}"></script>
@@ -123,6 +125,9 @@
                     event.preventDefault();
                     var inputtedbarcode = barcodeInput.value;
                     var selectedline = selectline.value;
+                    var tvmodelinput = tv_model.value;
+
+                    
                     
                 });
 
@@ -130,6 +135,31 @@
                     window.location.reload();
                 })
             });
-        </script>        
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Fetch data from the API endpoint
+                fetch('/app/resources/api/v1/data/products')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Get the select element
+                        const selectElement = document.getElementById('tv_model');
+            
+                        // Check if tv_model is an array before iterating
+                        if (Array.isArray(data.tv_model_list)) {
+                            // Iterate through the tv_model array and add options to the select element
+                            data.tv_model_list.forEach(item => {
+                                const option = document.createElement('option');
+                                option.value = item.tv_model;  // You can use tv_barcode if needed
+                                option.text = item.tv_model;
+                                selectElement.appendChild(option);
+                            });
+                        } else {
+                            console.error('tv_model is not an array:', data);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            });
+        </script>     
     </body>
 </html>

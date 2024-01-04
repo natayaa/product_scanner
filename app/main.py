@@ -7,6 +7,8 @@ from fastapi.templating import Jinja2Templates
 # load extended endpoint/api
 # API
 from api.user import User
+from api.tv_model_api import product
+from api.compare_data import scanner
 
 # ENDPOINTS
 from endpoint.index import index_page
@@ -20,3 +22,6 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost"],
 
 app.include_router(User)
 app.include_router(index_page)
+app.include_router(product)
+
+app.include_router(scanner)

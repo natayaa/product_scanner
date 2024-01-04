@@ -1,5 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
+from sqlalchemy.orm import defer
 
 # load object table
 from database.tableobject.product_template import Products
@@ -8,9 +9,25 @@ from database.db_api import DatabaseConnection
 
 class ProductConnection(DatabaseConnection):
     def __init__(self):
-        super.__init__()
+        super().__init__()
 
-    def add_product(self, username ,**product_detail):
+    def check_data(self, tv_model_input, remote_barcode_input):
+        try:
+            query = self.session.query(Products).filter_by(tv_model=tv_model_input, remote_barcode=remote_barcode_input).first()
+            if query:
+                return True
+            else:
+                return False
+        except IntegrityError as ie:
+            print(str(ie))
+            self.session.close()
+            return None
+
+    async def listing_model(self):
+        tv_model = self.session.query(Products.tv_model, Products.tv_barcode).all()
+        return tv_model
+
+    def add_product(self, username, **product_detail):
         try:
             product = Products()
             product.tv_model = product_detail.get("tv_model")
@@ -28,6 +45,7 @@ class ProductConnection(DatabaseConnection):
         finally:
             self.session.close()
 
+    # to listing all registered data from database
     def product_show(self, search=None, limit=int, offset=int):
         try:
             total_products = self.session.query(Products).count()
