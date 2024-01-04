@@ -24,7 +24,7 @@ class ProductConnection(DatabaseConnection):
             return None
 
     async def listing_model(self):
-        tv_model = self.session.query(Products.tv_model, Products.tv_barcode).all()
+        tv_model = self.session.query(Products.tv_model, Products.remote_barcode).all()
         return tv_model
 
     def add_product(self, username, **product_detail):
@@ -32,6 +32,7 @@ class ProductConnection(DatabaseConnection):
             product = Products()
             product.tv_model = product_detail.get("tv_model")
             product.remote_barcode = product_detail.get("remote_barcode")
+            product.carton_barcode = product_detail.get("carton_barcode")
             product.insert_by = username
             self.session.add(product)
             self.session.commit()
@@ -53,7 +54,7 @@ class ProductConnection(DatabaseConnection):
                 product_records = products.filter(
                     or_(
                         Products.tv_model.ilike(search),
-                        Products.remote_name.ilike(search)
+                        Products.remote_barcode.ilike(search)
                     )
                 )
             products_list = product_records.limit(limit).offset(offset).all()

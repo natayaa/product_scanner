@@ -13,6 +13,7 @@ class Logscan(DatabaseConnection):
             scanned = Scanned()
             scanned.tv_model = product_detail.get("tv_model")
             scanned.remote_barcode = product_detail.get("remote_barcode")
+            
             scanned.pic = incharge
             scanned.result = result
             self.session.add(scanned)
