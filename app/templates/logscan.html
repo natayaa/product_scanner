@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-witdh, initial-scale=1, shrink-to-fit=no" />
+        <meta name="author" content="Ivan Azhari (Software Engineers of TV Engineering)" />
+        <title>{{ title }}</title>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='assets/images/favicon.ico') }}" />
+        <!-- Bootstraps -->
+        <link rel="stylesheet" href="{{ url_for('static', path='css/bootstrap/bootstrap.min.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+
+    </head>
+    
+    <body class="d-flex flex-column h-100 bg-dark">
+        <main class="flex-shrink-0 bg-gradient">
+            <header class="bg-dark">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                    <div class="container px-5">
+                        <a class="navbar-brand" href="/">
+                            <img src="{{ url_for('static', path='assets/images/sharp-logo.png') }}" alt="Barcode Scanner" width="150px;"/>
+                        </a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarContent">
+                            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="">Registered Product</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="">Input Product</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </header>
+
+            <div class="container px-5">
+                <section class="vh-100">
+                    <div class="row justify-content-center">
+                        <div class="container-fluid mt-4">
+                            <div class="table-responsive mt-4 mb-4">
+                                <table class="table table-bordered align-middle mb-0 table-hover" style="background-color: azure;">
+                                    <thead class="bg-light text-center" style="position: sticky;">
+                                        <tr>
+                                            <th>Entry No</th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for data_scan in logscan_data %}
+                                        <tr>
+                                            <td>{{ data_scan.scan_id }}</td>
+                                            <td></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <script src="{{ url_for('static', path='js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', path='js/jquery.magniFic-popup.min.js') }}"></script>
+        <script src="{{ url_for('static', path='js/bootstrap/bootstrap.min.js') }}"></script>
+    </body>
+</html>

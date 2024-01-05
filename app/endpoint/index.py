@@ -7,5 +7,5 @@ template = Jinja2Templates(directory="templates/")
 
 @index_page.get("/", response_class=HTMLResponse)
 def index(request: Request):
-    page_retval = {"request": request}
+    page_retval = {"request": request, "title": "Scanner Page"}
     return template.TemplateResponse("index.html", context=page_retval, status_code=status.HTTP_200_OK)

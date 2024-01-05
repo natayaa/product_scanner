@@ -62,13 +62,16 @@
                                 </div>
                                 <div class="col-md-6 mt-4 mb-5" id="carton-box-display">
                                     <label for="carton_box" class="form-label fw-bolder text-white mb-2 text-left display-10">Carton Box</label>
-                                    <select class="form-select" id="carton_box">
-
-                                    </select>
+                                    <input class="form-control " id="carton_box" readonly>
                                 </div>
-                                <div class="col-md-6 mt-4 mb-5" style="display: none;" id="barcode-input-display">
-                                    <label for="barcode-input" class="form-label fw-bolder text-white mb-2 text-left display-10">Input Barcode</label>
+
+                                <div class="col-md-6 mt-4 mb-2" style="display: none;" id="barcode-input-display">
+                                    <label for="barcode-input" class="form-label fw-bolder text-white mb-2 text-left display-10">Input Remote Barcode</label>
                                     <input class="form-control" id="barcode-input">
+                                </div>
+                                <div class="col-md-6 mt-2 mb-5" style="display: none;" id="carton-barcode-input-display">
+                                    <label for="carton-barcode-input" class="form-label fw-bolder text-white mb-2 text-left display-10">Input Carton Barcode</label>
+                                    <input class="form-control" id="carton-barcode-input">
                                 </div>
                                 <div class="col-md-6 mt-4" id="apply-button">
                                     <button class="btn btn-primary" type="button" style="width: 100%;">Apply</button>
@@ -103,11 +106,13 @@
                 var submitBarcode = document.getElementById("submit_barcode_form");
                 var displayRefresh = document.getElementById("refreshpage");
                 var refresh_button = document.getElementById("refresh-button");
+                var carton_barcode_display = document.getElementById("carton-barcode-input-display");
 
                 
                 var barcodeInput = document.getElementById("barcode-input");
                 var selectline = document.getElementById("select_line");
                 var tv_model = document.getElementById("tv_model");
+                var carton_barcode_based = document.getElementById("carton_box").value;
                 
         
                 applyButton.addEventListener('click', function () {
@@ -119,6 +124,7 @@
                     // Display the barcode input
                     barcodeInputDisplay.style.display = 'block';
                     displayRefresh.style.display = 'block';
+                    carton_barcode_display.style.display = 'block';   
                 });
 
                 submitBarcode.addEventListener("submit", function(event) {
@@ -127,11 +133,12 @@
                     var selectedline = selectline.value;
                     var tvmodelinput = tv_model.value;
 
-                    
+                    console.log(selectedline, inputtedbarcode, tvmodelinput, carton_barcode_based);
                     
                 });
 
                 refresh_button.addEventListener("click", function(event) {
+                    carton_barcode_based.value = "";
                     window.location.reload();
                 })
             });
@@ -144,15 +151,32 @@
                     .then(data => {
                         // Get the select element
                         const selectElement = document.getElementById('tv_model');
-            
+                        const cartonbox_data = document.getElementById("carton_box");
+        
                         // Check if tv_model is an array before iterating
                         if (Array.isArray(data.tv_model_list)) {
                             // Iterate through the tv_model array and add options to the select element
                             data.tv_model_list.forEach(item => {
                                 const option = document.createElement('option');
-                                option.value = item.tv_model;  // You can use tv_barcode if needed
+                                option.value = item.tv_model;
                                 option.text = item.tv_model;
                                 selectElement.appendChild(option);
+                            });
+        
+                            // Add event listener to the select element
+                            selectElement.addEventListener('change', function () {
+                                // Get the selected TV model
+                                const selectedModel = selectElement.value;
+        
+                                // Find the corresponding carton box data
+                                const cartonData = data.tv_model_list.find(item => item.tv_model === selectedModel);
+        
+                                // Update the cartonbox_data element with the new data
+                                if (cartonData) {
+                                    cartonbox_data.value = cartonData.carton_barcode;
+                                } else {
+                                    console.error('Carton box data not found for selected TV model:', selectedModel);
+                                }
                             });
                         } else {
                             console.error('tv_model is not an array:', data);
@@ -160,6 +184,7 @@
                     })
                     .catch(error => console.error('Error fetching data:', error));
             });
-        </script>     
+        </script>
+        
     </body>
 </html>

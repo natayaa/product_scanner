@@ -13,7 +13,7 @@ class Logscan(DatabaseConnection):
             scanned = Scanned()
             scanned.tv_model = product_detail.get("tv_model")
             scanned.remote_barcode = product_detail.get("remote_barcode")
-            
+            scanned.carton_barcode = product_detail.get("carton_barcode")
             scanned.pic = incharge
             scanned.result = result
             self.session.add(scanned)
@@ -31,14 +31,14 @@ class Logscan(DatabaseConnection):
         total_records = self.session.query(Scanned).count()
         if search:
             search = f"%{search}%"
-            logs = query.filter(
+            query = query.filter(
                 or_(
                     Scanned.tv_model.ilike(search),
-                    Scanned.remote_name.ilike(search),
+                    Scanned.carton_barcode.ilike(search),
                     Scanned.result.ilike(search)
                 )
             )
-        data_logs = logs.limit(limit).offset(offset).all()
+        data_logs = query.limit(limit).offset(offset).all()
         retval = {"data_logs": data_logs, "total_records": total_records}
         return retval
     

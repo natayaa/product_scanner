@@ -24,7 +24,7 @@ class ProductConnection(DatabaseConnection):
             return None
 
     async def listing_model(self):
-        tv_model = self.session.query(Products.tv_model, Products.remote_barcode).all()
+        tv_model = self.session.query(Products.tv_model, Products.remote_barcode, Products.carton_barcode).all()
         return tv_model
 
     def add_product(self, username, **product_detail):
@@ -51,13 +51,13 @@ class ProductConnection(DatabaseConnection):
             products = self.session.query(Products)
             if search:
                 search = f"%{search}%"
-                product_records = products.filter(
+                products = products.filter(
                     or_(
                         Products.tv_model.ilike(search),
                         Products.remote_barcode.ilike(search)
                     )
                 )
-            products_list = product_records.limit(limit).offset(offset).all()
+            products_list = products.limit(limit).offset(offset).all()
             retval = {"product_list": products_list, "total_products": total_products}
             return retval
         except IntegrityError as ie:
