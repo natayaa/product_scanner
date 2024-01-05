@@ -6,9 +6,10 @@ class Scanned(Base):
     __tablename__ = "tb_scanned"
 
     scan_id = Column(Integer, autoincrement=True, primary_key=True)
+    scanner_line = Column(String)
     tv_model = Column(String, nullable=False)
     remote_barcode = Column(String, nullable=False)
     carton_barcode = Column(String, nullable=False)
     pic = Column(String, nullable=False)
     result = Column(String)
-    scanned_date = Column(String, default=datetime.now().strftime("%Y-%m-%d, %HH:%MM"))
+    scanned_date = Column(String, default=datetime.now().strftime("%Y-%m-%d, %H:%M"))

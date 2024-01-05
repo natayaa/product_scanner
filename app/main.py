@@ -23,13 +23,9 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost"],
                    allow_credentials=True, allow_methods=["*"])
 
 
-
 app.include_router(User)
-
 app.include_router(product)
-
 app.include_router(scanner)
-
 
 # HTML Endpoints
 app.include_router(index_page)

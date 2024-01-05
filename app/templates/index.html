@@ -27,11 +27,12 @@
                         <div class="collapse navbar-collapse" id="navbarContent">
                             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="">Log Scanner</a>
+                                    <a class="nav-link" href="/logscan-page">Log Scanner</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="">Registered Product</a>
+                                    <a class="nav-link" href="/products-page">Registered Product</a>
                                 </li>
+                                <!-- make modal -->
                                 <li class="nav-item">
                                     <a class="nav-link" href="">Input Product</a>
                                 </li>
@@ -41,16 +42,16 @@
                 </nav>
             </header>
 
-            <div class="container px-5">
+            <div class="container px-5 mb-5">
                 <div class="row gx-2 align-items-center justify-content-center mt-5">
                     <div class="col-lg-8 col-xl-7 col-xxl-6">
                         <div class="my-2 text-center text-xl-start">
-                            <form id="submit_barcode_form">
+                            <form id="submit_barcode_form" class="mt-5">
                                 <div class="col-md-6 mt-4" id="scanner-line-display">
                                     <label for="select_line" class="form-label fw-bolder text-white mb-2 text-left display-10">Select LINE</label>
                                     <select class="form-select" id="select_line">
                                         {% for line in range(1,5) %}
-                                            <option value="line_{{ line }}">LINE {{ line }}</option>
+                                            <option value="LINE_{{ line }}">LINE {{ line }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -62,7 +63,7 @@
                                 </div>
                                 <div class="col-md-6 mt-4 mb-5" id="carton-box-display">
                                     <label for="carton_box" class="form-label fw-bolder text-white mb-2 text-left display-10">Carton Box</label>
-                                    <input class="form-control " id="carton_box" readonly>
+                                    <input class="form-control" id="carton_box" readonly>
                                 </div>
 
                                 <div class="col-md-6 mt-4 mb-2" style="display: none;" id="barcode-input-display">
@@ -79,6 +80,9 @@
                                 <div class="col-md-6 mt-4 mb-5" style="display: none;" id="refreshpage">
                                     <button class="btn btn-secondary" type="button" style="width: 100%;" id="refresh-button">Refresh</button>
                                 </div>
+                                <div class="col-md-6 mt-4 mb-5" style="display: none;" id="submitbutton">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -90,7 +94,9 @@
             </div>          
         </main>
         <!-- Footer -->
-
+        <div class="mt-5">
+            {% include 'include/footer.html' %}
+        </div>
         <!-- javascripts -->
         <script src="{{ url_for('static', path='js/jquery.min.js')}}"></script>
         <script src="{{ url_for('static', path='js/jquery.magnific-popup.min.js ')}}"></script>
@@ -112,7 +118,7 @@
                 var barcodeInput = document.getElementById("barcode-input");
                 var selectline = document.getElementById("select_line");
                 var tv_model = document.getElementById("tv_model");
-                var carton_barcode_based = document.getElementById("carton_box").value;
+                var carton_barcode_based = document.getElementById("carton-barcode-input");
                 
         
                 applyButton.addEventListener('click', function () {
@@ -127,15 +133,65 @@
                     carton_barcode_display.style.display = 'block';   
                 });
 
+                barcodeInput.addEventListener("keydown", function(event) {
+                    if (event.key === "Enter") {
+                        // Prevent the default form submission
+                        event.preventDefault();
+                        
+                        // Move focus to carton_barcode input
+                        carton_barcode_based.focus();
+                    }
+                });
+
                 submitBarcode.addEventListener("submit", function(event) {
                     event.preventDefault();
+                    
+                    // Retrieve values from form inputs
                     var inputtedbarcode = barcodeInput.value;
                     var selectedline = selectline.value;
                     var tvmodelinput = tv_model.value;
-
-                    console.log(selectedline, inputtedbarcode, tvmodelinput, carton_barcode_based);
-                    
+                    var carton_barcode = carton_barcode_based.value;
+                
+                    // Construct the data object to be sent to the server
+                    var data = {
+                        pic: "Operator",
+                        remote_tv_barcode: inputtedbarcode,
+                        scanner_line: selectedline,
+                        tv_model: tvmodelinput,
+                        carton_barcode: carton_barcode
+                    };
+                
+                    // Specify the endpoint URL
+                    var endpointUrl = '/app/resources/api/v1/data/model/compare';
+                    var statusImage = document.getElementById('status-product-image');
+                    // Make a POST request to the endpoint with the data
+                    fetch(endpointUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => {
+                        if (response.status === 200) {
+                            // Change the image to NG.png
+                            statusImage.src = "{{ url_for('static', path='assets/images/OK.png ')}}";
+                        } else {
+                            // Change the image to OK.png
+                            statusImage.src = "{{ url_for('static', path='assets/images/NG.png ')}}";
+                        }
+                        return response.json();
+                    })
+                    .then(result => {
+                        // Handle the response from the server if needed
+                        console.log(result);
+                    })
+                    .catch(error => {
+                        // Handle errors
+                        console.error('Error:', error);
+                    });
                 });
+                
 
                 refresh_button.addEventListener("click", function(event) {
                     carton_barcode_based.value = "";

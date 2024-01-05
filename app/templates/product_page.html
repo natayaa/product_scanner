@@ -9,6 +9,7 @@
         <!-- Bootstrap -->
         <link rel="stylesheet" href="{{ url_for('static', path='css/bootstrap/bootstrap.min.css') }}" />
         <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', path='css/bootstrap-icons.css') }}" />
     </head>
     <body class="d-flex flex-column h-100 bg-dark">
         <main class="flex-shrink-0 bg-gradient">
@@ -30,11 +31,78 @@
                                     <!-- turn into modal -->
                                     <a class="nav-link" href="#">Register Product</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/logscan-page">Log Scan</a>
+                                </li>
                             </ul>
                         </div>
                     </div>
                 </nav>
             </header>
+            
+            <div class="container py-5">
+                <section class="vh-100">
+                    <div class="row justify-content-center">
+                        <div class="container-fluid mt-4">
+                            <div class="table-responsive mt-4 mb-4">
+                                <table class="table table-bordered align-middle table-hover" style="background-color: aquamarine">
+                                    <thead class="bg-light text-center" style="position: sticky;">
+                                        <tr>
+                                            <th>Item ID</th>
+                                            <th>TV Model</th>
+                                            <th>Remote Barcode</th>
+                                            <th>Carton Barcode</th>
+                                            <th>Inserted By</th>
+                                            <th>Date Added</th>
+                                            <th>Option</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-center">
+                                        {% for data in product_lists %}
+                                        <tr>
+                                            <td>{{ data.item_id }}</td>
+                                            <td>{{ data.tv_model }}</td>
+                                            <td>{{ data.remote_barcode }}</td>
+                                            <td>{{ data.carton_barcode }}</td>
+                                            <td>{{ data.insert_by }}</td>
+                                            <td>{{ data.date_added }}</td>
+                                            <td>
+                                                <button class="btn btn-danger">
+                                                    <span class="bi bi-trash"></span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- pagination -->
+                            <nav aria-label="Pagination Table">
+                                <ul class="pagination justify-content-center">
+                                    {% if page > 1 %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="/products-page?pages={{ page - 1}}&perpage={{ limit }}">Previous</a>
+                                    </li>
+                                    {% endif %}
+
+                                    {% for page_num in range(1, total_records )%}
+                                    <li class="page-item">
+                                        <a class="page-link" href="/products-page?pages={{ page_num }}&perpage={{ limit }}">{{ page_num }}</a>
+                                    </li>
+                                    {% endfor %}
+
+                                    {% if page < total_records %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="/products-page?pages={{ page + 1 }}&perpage={{ limit }}">Next</a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </main>
+        {% include 'include/footer.html' %}
     </body>
 </html>

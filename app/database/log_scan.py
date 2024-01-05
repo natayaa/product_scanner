@@ -11,6 +11,7 @@ class Logscan(DatabaseConnection):
     def insert_logscan(self, incharge: str, result: str,  **product_detail):
         try:
             scanned = Scanned()
+            scanned.scanner_line = product_detail.get("scanner_line")
             scanned.tv_model = product_detail.get("tv_model")
             scanned.remote_barcode = product_detail.get("remote_barcode")
             scanned.carton_barcode = product_detail.get("carton_barcode")

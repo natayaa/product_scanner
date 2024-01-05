@@ -16,13 +16,17 @@ logscan = Logscan()
 async def compare_data(payload: CompareBody):
     # retrieve data from user and then compare based on registered item in database
     check_datas = products.check_data(tv_model_input=payload.tv_model, remote_barcode_input=payload.remote_tv_barcode)
+    # mapping the payload
+    data_scanned = {"tv_model": payload.tv_model, "remote_barcode": payload.remote_tv_barcode, 
+                    "carton_barcode": payload.carton_barcode, "scanner_line": payload.scanner_line}
     if check_datas:
         # write log into table
-        write_scanned = logscan.insert_logscan(incharge="user", result="OK", )
+        write_scanned = logscan.insert_logscan(incharge=payload.pic, result="OK", **data_scanned)
         return JSONResponse(content={"message": f"{payload.tv_model} is matched with {payload.remote_tv_barcode}",
-                                     "success": check_datas},
+                                     "success": check_datas, "response_insert_log": write_scanned},
                             status_code=status.HTTP_200_OK)
     else:
+        write_failed_scanned = logscan.insert_logscan(incharge=payload.pic, result="NG", **data_scanned)
         return JSONResponse(content={"message": f"{payload.tv_model} is not matched with {payload.remote_tv_barcode}",
-                                     "success": check_datas},
+                                     "success": check_datas, "response_insert_log": write_failed_scanned},
                             status_code=status.HTTP_400_BAD_REQUEST)
