@@ -29,7 +29,7 @@
                                 </li>
                                 <li class="nav-item">
                                     <!-- turn into modal -->
-                                    <a class="nav-link" href="#">Register Product</a>
+                                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#register_product_modal">Register Product</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="/logscan-page">Log Scan</a>
@@ -67,7 +67,7 @@
                                             <td>{{ data.insert_by }}</td>
                                             <td>{{ data.date_added }}</td>
                                             <td>
-                                                <button class="btn btn-danger">
+                                                <button class="btn btn-danger" id="button_delete_data" onclick="deleteProduct({{ data.item_id }})">
                                                     <span class="bi bi-trash"></span>
                                                 </button>
                                             </td>
@@ -80,29 +80,138 @@
                             <nav aria-label="Pagination Table">
                                 <ul class="pagination justify-content-center">
                                     {% if page > 1 %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="/products-page?pages={{ page - 1}}&perpage={{ limit }}">Previous</a>
-                                    </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="/products-page?pages={{ page - 1 }}&perpage={{ limit }}">Previous</a>
+                                        </li>
                                     {% endif %}
-
-                                    {% for page_num in range(1, total_records )%}
-                                    <li class="page-item">
-                                        <a class="page-link" href="/products-page?pages={{ page_num }}&perpage={{ limit }}">{{ page_num }}</a>
-                                    </li>
+                            
+                                    {% for page_number in range(1, total_records + 1) %}
+                                        <li class="page-item {% if page_number == page %}active{% endif %}">
+                                            <a class="page-link" href="/products-page?pages={{ page_number }}&perpage={{ limit }}">{{ page_number }}</a>
+                                        </li>
                                     {% endfor %}
-
+                            
                                     {% if page < total_records %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="/products-page?pages={{ page + 1 }}&perpage={{ limit }}">Next</a>
-                                    </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="/products-page?pages={{ page + 1 }}&perpage={{ limit }}">Next</a>
+                                        </li>
                                     {% endif %}
                                 </ul>
                             </nav>
+                            
+                        </div>
+                    </div>
+                </section>
+                <!-- Register Product Modal -->
+                <section>
+                    <div class="modal fade" id="register_product_modal" tabindex="-1" aria-labelledby="Register Product Modal" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Register Product</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="max-height: 480px; overflow-y: auto;">
+                                    <form id="register_product_form">
+                                        <div class="mt-2">
+                                            <label for="tv_model" class="form-label">TV Model Name</label>
+                                            <input id="tv_model" class="form-control">
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="remote_barcode" class="form-label">Remote Barcode</label>
+                                            <input id="remote_barcode" class="form-control">
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="carton_barcode" class="form-label">Carton Barcode</label>
+                                            <input id="carton_barcode" class="form-control">
+                                        </div>
+                                        <div class="mt-2" stlyle="display: none;">
+                                            <label for="insert_by" class="form-label">Insert BY</label>
+                                            <input id="insert_by" class="form-control" readonly>
+                                        </div>
+                                        <div class="mt-5 mb-5">
+                                            <button class="btn btn-primary" type="submit" style="width: 100%;">Register</button>
+                                        </div>
+                                        <div class="mb-4">
+                                            <p class="text-center" id="result_endpoint_register_product"></p>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
             </div>
         </main>
         {% include 'include/footer.html' %}
+        <script src="{{ url_for('static', path='js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', path='js/bootstrap/bootstrap.bundle.min.js') }}"></script>
+        <script>
+            document.addEventListener("submit", function (event){
+                event.preventDefault();
+                var tv_model_value = document.getElementById("tv_model").value;
+                var remote_barcode_value = document.getElementById("remote_barcode").value;
+                var carton_barcode_value = document.getElementById("carton_barcode").value;
+                var insert_by_value = "System";
+                var result_response = document.getElementById("result_endpoint_register_product");
+
+                var data_payload = {
+                    tv_model: tv_model_value,
+                    remote_barcode: remote_barcode_value,
+                    carton_barcode: carton_barcode_value,
+                    insert_by: insert_by_value
+                };
+                var endpointURL = "/app/resources/api/v1/data/products/add_product";
+
+                fetch(endpointURL, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(data_payload)
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        window.location.reload();
+                    } else {
+                        result_response.innerHTML = response.message;
+                    }
+                    return response.json();
+                })
+            })
+        </script>
+        <script>
+            function deleteProduct(itemId) {
+                var confirmation = confirm("Are you sure you want to delete this product?");
+                if (confirmation) {
+                    // Define the endpoint URL
+                    var endpoint = `/app/resources/api/v1/data/products/delete?item_id=${itemId}`;
+        
+                    // Create the request headers
+                    var headers = new Headers();
+                    headers.append("Content-Type", "application/json");
+        
+                    // Create the request options
+                    var options = {
+                        method: "DELETE",
+                        headers: headers,
+                    };
+        
+                    // Send the DELETE request
+                    fetch(endpoint, options)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Failed to delete the product");
+                            }
+                            // Optionally, handle success response
+                            console.log("Product deleted successfully");
+                            // You can redirect or update the UI here if needed
+                            window.location.reload();
+                        })
+                        .catch(error => {
+                            console.error("Error deleting product:", error.message);
+                            // Handle the error, display a message, or log it
+                        });
+                }
+            }
+        </script>
     </body>
 </html>

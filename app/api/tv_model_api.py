@@ -28,3 +28,8 @@ def add_tv_product(register_payload: RegisterProduct):
         return JSONResponse(content={"message": "Data has been inputted into database.", "status_code": status.HTTP_201_CREATED}, status_code=status.HTTP_200_OK)
     else:
         return JSONResponse(content={"message": "Something went wrong", "status_code": status.HTTP_400_BAD_REQUEST}, status_code=status.HTTP_400_BAD_REQUEST)
+    
+@product.delete("/products/delete", response_class=JSONResponse)
+def delete_registered_product(item_id: int):
+    delete_product = pconnect.delete_product(item_id=item_id)
+    return JSONResponse(content={"message": f"{delete_product} has been deleted."})
