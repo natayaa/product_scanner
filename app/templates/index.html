@@ -32,10 +32,6 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="/products-page">Registered Product</a>
                                 </li>
-                                <!-- make modal -->
-                                <li class="nav-item">
-                                    <a class="nav-link" href="">Input Product</a>
-                                </li>
                             </ul>
                         </div>
                     </div>
@@ -70,10 +66,10 @@
                                     <label for="barcode-input" class="form-label fw-bolder text-white mb-2 text-left display-10">Input Remote Barcode</label>
                                     <input class="form-control" id="barcode-input">
                                 </div>
-                                <div class="col-md-6 mt-2 mb-5" style="display: none;" id="carton-barcode-input-display">
+                                <!--div class="col-md-6 mt-2 mb-5" style="display: none;" id="carton-barcode-input-display">
                                     <label for="carton-barcode-input" class="form-label fw-bolder text-white mb-2 text-left display-10">Input Carton Barcode</label>
                                     <input class="form-control" id="carton-barcode-input">
-                                </div>
+                                </div-->
                                 <div class="col-md-6 mt-4" id="apply-button">
                                     <button class="btn btn-primary" type="button" style="width: 100%;">Apply</button>
                                 </div>
@@ -133,15 +129,15 @@
                     carton_barcode_display.style.display = 'block';   
                 });
 
-                barcodeInput.addEventListener("keydown", function(event) {
-                    if (event.key === "Enter") {
-                        // Prevent the default form submission
-                        event.preventDefault();
+                //barcodeInput.addEventListener("keydown", function(event) {
+                //    if (event.key === "Enter") {
+                //        // Prevent the default form submission
+                //        event.preventDefault();
                         
                         // Move focus to carton_barcode input
-                        carton_barcode_based.focus();
-                    }
-                });
+                        //carton_barcode_based.focus();
+                //    }
+                //});
 
                 submitBarcode.addEventListener("submit", function(event) {
                     event.preventDefault();
@@ -150,7 +146,7 @@
                     var inputtedbarcode = barcodeInput.value;
                     var selectedline = selectline.value;
                     var tvmodelinput = tv_model.value;
-                    var carton_barcode = carton_barcode_based.value;
+                    ///var carton_barcode = carton_barcode_based.value;
                 
                     // Construct the data object to be sent to the server
                     var data = {
@@ -158,7 +154,7 @@
                         remote_tv_barcode: inputtedbarcode,
                         scanner_line: selectedline,
                         tv_model: tvmodelinput,
-                        carton_barcode: carton_barcode
+                        carton_barcode: 'carton_barcode'
                     };
                 
                     // Specify the endpoint URL
@@ -180,6 +176,11 @@
                             // Change the image to OK.png
                             statusImage.src = "{{ url_for('static', path='assets/images/NG.png ')}}";
                         }
+                        setTimeout(() => {
+                            // Change the image back to the default image
+                            statusImage.src = "{{ url_for('static', path='assets/images/waiting-scanner.png')}}";
+                        }, 2200);
+
                         return response.json();
                     })
                     .then(result => {
@@ -194,7 +195,7 @@
                 
 
                 refresh_button.addEventListener("click", function(event) {
-                    carton_barcode_based.value = "";
+                    //carton_barcode_based.value = "";
                     window.location.reload();
                 })
             });
@@ -208,6 +209,14 @@
                         // Get the select element
                         const selectElement = document.getElementById('tv_model');
                         const cartonbox_data = document.getElementById("carton_box");
+        
+                        // Add a default disabled option
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = 'default';
+                        defaultOption.text = 'Select TV Model';
+                        defaultOption.disabled = true;
+                        defaultOption.selected = true;
+                        selectElement.appendChild(defaultOption);
         
                         // Check if tv_model is an array before iterating
                         if (Array.isArray(data.tv_model_list)) {
@@ -224,14 +233,20 @@
                                 // Get the selected TV model
                                 const selectedModel = selectElement.value;
         
-                                // Find the corresponding carton box data
-                                const cartonData = data.tv_model_list.find(item => item.tv_model === selectedModel);
-        
-                                // Update the cartonbox_data element with the new data
-                                if (cartonData) {
-                                    cartonbox_data.value = cartonData.carton_barcode;
+                                // Check if the default option is selected
+                                if (selectedModel === 'default') {
+                                    // Handle the case when the default option is selected
+                                    cartonbox_data.value = '';  // or do any other desired action
                                 } else {
-                                    console.error('Carton box data not found for selected TV model:', selectedModel);
+                                    // Find the corresponding carton box data
+                                    const cartonData = data.tv_model_list.find(item => item.tv_model === selectedModel);
+        
+                                    // Update the cartonbox_data element with the new data
+                                    if (cartonData) {
+                                        cartonbox_data.value = cartonData.carton_barcode;
+                                    } else {
+                                        console.error('Carton box data not found for selected TV model:', selectedModel);
+                                    }
                                 }
                             });
                         } else {
@@ -240,7 +255,6 @@
                     })
                     .catch(error => console.error('Error fetching data:', error));
             });
-        </script>
-        
+        </script>    
     </body>
 </html>
