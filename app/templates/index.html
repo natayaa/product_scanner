@@ -172,9 +172,11 @@
                         if (response.status === 200) {
                             // Change the image to NG.png
                             statusImage.src = "{{ url_for('static', path='assets/images/OK.png ')}}";
+                            barcodeInput.value = "";
                         } else {
                             // Change the image to OK.png
                             statusImage.src = "{{ url_for('static', path='assets/images/NG.png ')}}";
+                            barcodeInput.value = "";
                         }
                         setTimeout(() => {
                             // Change the image back to the default image

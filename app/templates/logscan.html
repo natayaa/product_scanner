@@ -48,7 +48,7 @@
                                             <th>Entry No</th>
                                             <th>IN LINE</th>
                                             <th>TV Model</th>
-                                            <th>Carton Barcode</th>
+                                            <!--th>Carton Barcode</th--->
                                             <th>Remote Barcode</th>
                                             <th>PIC</th>
                                             <th>Result</th>
@@ -61,7 +61,7 @@
                                             <td>{{ data_scan.scan_id }}</td>
                                             <td>{{ data_scan.scanner_line }}</td>
                                             <td>{{ data_scan.tv_model }}</td>
-                                            <td>{{ data_scan.carton_barcode }}</td>
+                                            <!--td>{{ data_scan.carton_barcode }}</td-->
                                             <td>{{ data_scan.remote_barcode }}</td>
                                             <td>{{ data_scan.pic }}</td>
                                             <td style="background-color: {{ 'red' if data_scan.result == 'NG' else 'green' }}" class="text-white">{{ data_scan.result }}</td>
